@@ -5,7 +5,7 @@ import time as waktu
 from PIL import Image
 import pyautogui
 import mss
-import pygetwindow as gw
+#import pygetwindow as gw
 
 def findImage(kliktime,threshold,scs,mata,axiex,axiey,axiew,axieh,notepadw,notepadh):
 	statusku = False

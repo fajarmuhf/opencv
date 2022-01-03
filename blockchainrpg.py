@@ -6,56 +6,43 @@ from PIL import Image
 import pyautogui
 import mss
 import sys
-import pygetwindow as gw
-from windowgame import *
+#import pygetwindow as gw
+#from windowgame import *
 from findimage import *
-from windowfocus import *
+#from windowfocus import *
 import pytesseract
 import time
 
-sct = mss.mss()
+#sct = mss.mss()
 			
 loop_time = waktu.time()
 
-axiex,axiey,axiew,axieh = setGame("Chrome",0,0)
-setActiveWindow("Chrome")
+axiex,axiey,axiew,axieh = (0,0,1136,750)
+#setActiveWindow("Chrome")
 
 notepadx,notepady,notepadw,notepadh = None,None,None,None
 
-status = "Main menu"
+status = "Result"
 awal = 0
 hpStatus = 100
 	
 while(True):
 	time.sleep(5)
-	axiex,axiey,axiew,axieh = setGame("Chrome",0,0)
+	axiex,axiey,axiew,axieh = (0,27,1136,750)
 	
-	scs = sct.grab({
-            'left': axiex,
-            'top': axiey,
-            'width': axiew,
-            'height': axieh
-        })
+	scs = pyautogui.screenshot(region=(0,27, 1136, 750))
 	scs = np.array(scs)
-	scs = cv.cvtColor(scs, cv.IMREAD_COLOR)
+	scs = cv.cvtColor(scs, cv.COLOR_RGB2BGR)
 
-	scs4 = sct.grab({
-        'left': 220*axiew/568.0,
-        'top': 225*axieh/375.0,
-        'width': 133*axiew/568.0,
-        'height': 100*axieh/375.0
-        })
+	scs4 = pyautogui.screenshot(region=(195*2*axiew/1136.0,(205-27)*2*axieh/750.0, 183*2*axiew/1136.0,100*2*axieh/750.0))
+        
 	scs4 = np.array(scs4)
-	scs4 = cv.cvtColor(scs4, cv.IMREAD_COLOR)
+	scs4 = cv.cvtColor(scs4, cv.COLOR_RGB2BGR)
 
-	scs3 = sct.grab({
-        'left': 420*axiew/568.0,
-        'top': 365*axieh/375.0,
-        'width': 93*axiew/568.0,
-        'height': 30*axieh/375.0
-	})
+	scs3 = pyautogui.screenshot(region=(450*2*axiew/1136.0,(370-27)*2*axieh/750.0, 93*2*axiew/1136.0,30*2*axieh/750.0 ))
+        
 	scs3 = np.array(scs3)
-	scs3 = cv.cvtColor(scs3, cv.IMREAD_COLOR)
+	scs3 = cv.cvtColor(scs3, cv.COLOR_RGB2BGR)
 
 	gray = cv.cvtColor(scs3, cv.COLOR_BGR2GRAY)
 	thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
@@ -65,16 +52,12 @@ while(True):
 	opening = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel, iterations=1)
 
 	# Perform text extraction
-	data3 = pytesseract.image_to_string(opening, lang='eng', config='--psm 11')
+	data3 = pytesseract.image_to_string(opening, lang='eng', config='--psm 10')
 	try:
-		scs2 = sct.grab({
-	        'left': 95*axiew/568.0,
-	        'top': 155*axieh/375.0,
-	        'width': 80*axiew/568.0,
-	        'height': 10*axieh/375.0
-		})
+		scs2 = pyautogui.screenshot(region=(95*axiew/1136.0,(162+27)*axieh/750.0, 80*2*axiew/1136.0, 15*axieh/750.0))
+	        
 		scs2 = np.array(scs2)
-		scs2 = cv.cvtColor(scs2, cv.IMREAD_COLOR)
+		scs2 = cv.cvtColor(scs2, cv.COLOR_RGB2BGR)
 
 		gray = cv.cvtColor(scs2, cv.COLOR_BGR2GRAY)
 		thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
@@ -84,7 +67,7 @@ while(True):
 		opening = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel, iterations=1)
 
 		# Perform text extraction
-		data = pytesseract.image_to_string(opening, lang='eng', config='--psm 11')
+		data = pytesseract.image_to_string(opening, lang='eng', config='--psm 4')
 		data = data.replace("Z", "3")
 		data = data.replace("I", "1")
 		data = data.replace("[", "1")
@@ -137,9 +120,10 @@ while(True):
 	opening = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel, iterations=1)
 
 	# Perform text extraction
-	data = pytesseract.image_to_string(opening, lang='eng', config='--psm 11')
+	data = pytesseract.image_to_string(opening, lang='eng', config='--psm 12')
 	
 	print(loadfree)
+	print(data)
 	if data.find("transaction") != -1 or data.find("hash") != -1 or data.find("assertion") != -1 or data.find("Hunt Reward.") != -1 or data.find("billed") != -1:
 		mata = cv.imread('close.jpg',cv.IMREAD_UNCHANGED)
 		statusClose = findImage(1,0.8,scs,mata,axiex,axiey,axiew,axieh,notepadw,notepadh)
@@ -162,7 +146,8 @@ while(True):
 		pass
 	print(hpStatus)
 	print(status)
-	if hpStatus >= 20:
+	print(data3)
+	if hpStatus >= 23:
 		if status == "Map":
 			mata = "";
 			if hpStatus >= 80:
@@ -238,12 +223,13 @@ while(True):
 	#print(status, end='\r')
 	#sys.stdout.write("\033[K")
 	
-	hasil = cv.imshow('Result',scs);
+	hasil = cv.imshow('Result',scs4);
+	cv.moveWindow('Result',int(axiex+axiew),int(axiey-60))
 
 	try:
-		notepadx,notepady,notepadw,notepadh = setGame("Result",int(axiex + axiew),int(axiey-83))
+		notepadx,notepady,notepadw,notepadh = (int(axiex + axiew),int(axiey-60),1136,750)
 		if awal == 0:
-			pyautogui.click(notepadw/2*axiew/(notepadw)+axiex,notepadh/2*axieh/(notepadh)+axiey+20*axieh/(notepadh))
+			pyautogui.click(notepadw/2*axiew/(notepadw)+axiex,notepadh/2*axieh/(notepadh)+axiey+40*axieh/(notepadh))
 			awal = 1
 	except Exception as e:	
 		pass
